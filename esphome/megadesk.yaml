@@ -26,8 +26,8 @@ ota:
   password: ""
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  ssid: ""
+  password: ""
 
   ap:
     ssid: "Desk Fallback Hotspot"
@@ -109,6 +109,40 @@ number:
       - uart.write: !lambda |-
           char buf[20];
           sprintf(buf, "<=%i,.", int(x));
+          std::string s = buf;
+          return std::vector<unsigned char>( s.begin(), s.end() );
+  - platform: template
+    name: "Megadesk relative Height up (raw)"
+    id: megadesk_relative_height_up_raw
+    internal: true
+    min_value: 0
+    max_value: 6640
+    step: 1
+    mode: slider
+    update_interval: never
+    lambda: |-
+      return id(megadesk_raw).state;
+    set_action:
+      - uart.write: !lambda |-
+          char buf[20];
+          sprintf(buf, "<+%i,.", int(x));
+          std::string s = buf;
+          return std::vector<unsigned char>( s.begin(), s.end() );
+  - platform: template
+    name: "Megadesk relative Height down (raw)"
+    id: megadesk_relative_height_down_raw
+    internal: true
+    min_value: 0
+    max_value: 6640
+    step: 1
+    mode: slider
+    update_interval: never
+    lambda: |-
+      return id(megadesk_raw).state;
+    set_action:
+      - uart.write: !lambda |-
+          char buf[20];
+          sprintf(buf, "<-%i,.", int(x));
           std::string s = buf;
           return std::vector<unsigned char>( s.begin(), s.end() );
 
