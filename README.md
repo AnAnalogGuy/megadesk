@@ -3,6 +3,10 @@
 # megadesk
 Do you wish your IKEA Bekant had memory buttons? I sure did. So I made megadesk. Design goals were to have it fit in the original housing and use as many stock parts as possible, be completely independant of the existing controller, as well as store any number of memory positions.
 
+You can now use the [megadesk companion](https://www.tindie.com/products/gcormier/megadesk-companion/) if you want to integrate it with your smarthome.
+
+
+
 <img  src="PCB%20and%20Housing.png" width=25%/> <img  src="render.png" width=30%/>
 
 # For sale on Tindie - Plug and Play!
@@ -16,7 +20,9 @@ The factory recalibration routine has been implemented. The original BEKANT cont
 Any interruption to this procedure requires a power-cycle.
 
 ### Serial control 
-Enables serial input/output for what the megadesk is doing and to send commands. Some people wanted to have a smart/connected megadesk, but due to the size limitations of the space inside the case, an external module is the best solution. A lot of discussion in PR #12 and PR #58.
+Enables serial input/output for what the megadesk is doing and to send commands. Some people wanted to have a smart/connected megadesk, but due to the size limitations of the space inside the case, an external module is the best solution. A lot of discussion in PR #12 and PR #58, as well as [discussion thread #87](https://github.com/gcormier/megadesk/discussions/87). 
+
+You should also check out [Megadesk Companion](https://github.com/gcormier/megadesk_companion) for a plug and play `esphome` solution.
 
 More information in [Serial.md](Serial.md). There's also specific details on [esphome](esphome.md).
 
@@ -94,6 +100,11 @@ To recall a memory slot you push the up button the number of times for that memo
       - Once functionality is confirmed, replace with megadesk.   
    1. Megadesk
       - Push the UP button 14 times. 
+
+# In the news
+If you've made a blog/video posting with Megadesk, please open a PR to add it here, or send me a message with the URL.
+1. https://calvin.me/ikea-bekant-megadesk/
+1. https://www.youtube.com/watch?v=QopaeB1k6LU
 
 # Hacking, contributing and DIY
 This has been moved to [DIY.md](DIY.md) 
