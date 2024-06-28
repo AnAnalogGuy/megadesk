@@ -45,12 +45,12 @@
 #define EEPROM_SIG_SLOT   0
 #define MAGIC_SIG         0x120d // bytes: 13, 18 in little endian order
 #define MIN_SLOT          2  // 1 is possible but cant save without serial
-#ifdef ENABLERESET 
+#ifdef ENABLERESET
 #define FORCE_RESET       15  // force reset
 #endif
 #define MIN_HEIGHT_SLOT   11
 #define MAX_HEIGHT_SLOT   12
-#define RECALIBRATE       14 // if build option AUTO_SET_MIN_HEIGHT is set, this slot is used to store DANGER_MIN_HEIGHT
+#define RECALIBRATE       14 // if build flag AUTO_SET_MIN_HEIGHT is set, used to persist DANGER_MIN_HEIGHT
 #define RESERVED_VARIANT  16 // reserved - deliberately empty
 #define FEEDBACK_SLOT     17 // short tones on every button-press. buzz on no-ops
 #define BOTHBUTTON_SLOT   18 // store whether bothbuttons is enabled
@@ -140,7 +140,6 @@ uint16_t oldHeight = 0; // previously reported height
 // Changing these might be a really bad idea. They are sourced from
 // decoding the OEM controller limits.
 #define DANGER_MAX_HEIGHT (6777 - HYSTERESIS)
-
 
 #if (defined AUTO_SET_MIN_HEIGHT)
   // DANGER_MIN_HEIGHT was initially declared as a constant. Changed to a variable to allow dynamically updating after recalibiration of the table. 
@@ -467,7 +466,7 @@ void recvData()
   // read ascii digits
   while ((ndx >= numChars) && ((r = readdigits()) != -1)) {
     receivedBytes[ndx] = r;
-    digits = 0; // clear§
+    digits = 0; // clear
     if (++ndx == numFields) {
       // thats all 4 fields. parse/process them now and break-out.
       parseData(receivedBytes[1],
