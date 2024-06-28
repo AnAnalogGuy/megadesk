@@ -85,6 +85,7 @@ uint8_t linBurst();
 void sendInitPacket(byte a1 = 255, byte a2 = 255, byte a3 = 255, byte a4 = 255);
 byte recvInitPacket(byte array[]);
 
+void toggleDangerMinHeight();
 void toggleMinHeight();
 void toggleMaxHeight();
 void toggleBothMode();

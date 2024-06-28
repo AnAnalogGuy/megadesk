@@ -45,12 +45,12 @@
 #define EEPROM_SIG_SLOT   0
 #define MAGIC_SIG         0x120d // bytes: 13, 18 in little endian order
 #define MIN_SLOT          2  // 1 is possible but cant save without serial
-#ifdef ENABLERESET
+#ifdef ENABLERESET 
 #define FORCE_RESET       15  // force reset
 #endif
 #define MIN_HEIGHT_SLOT   11
 #define MAX_HEIGHT_SLOT   12
-#define RECALIBRATE       14 // nothing is stored there
+#define RECALIBRATE       14 // if build option AUTO_SET_MIN_HEIGHT is set, this slot is used to store DANGER_MIN_HEIGHT
 #define RESERVED_VARIANT  16 // reserved - deliberately empty
 #define FEEDBACK_SLOT     17 // short tones on every button-press. buzz on no-ops
 #define BOTHBUTTON_SLOT   18 // store whether bothbuttons is enabled
@@ -140,7 +140,14 @@ uint16_t oldHeight = 0; // previously reported height
 // Changing these might be a really bad idea. They are sourced from
 // decoding the OEM controller limits.
 #define DANGER_MAX_HEIGHT (6777 - HYSTERESIS)
-#define DANGER_MIN_HEIGHT (162 + HYSTERESIS)
+
+
+#if (defined AUTO_SET_MIN_HEIGHT)
+  // DANGER_MIN_HEIGHT was initially declared as a constant. Changed to a variable to allow dynamically updating after recalibiration of the table. 
+  uint16_t DANGER_MIN_HEIGHT = (162 + HYSTERESIS);
+#else
+  #define DANGER_MIN_HEIGHT (162 + HYSTERESIS)
+#endif
 
 // any button pressed?
 #define PRESSED(b) (b != Button::NONE)
@@ -460,7 +467,7 @@ void recvData()
   // read ascii digits
   while ((ndx >= numChars) && ((r = readdigits()) != -1)) {
     receivedBytes[ndx] = r;
-    digits = 0; // clear
+    digits = 0; // clear§
     if (++ndx == numFields) {
       // thats all 4 fields. parse/process them now and break-out.
       parseData(receivedBytes[1],
@@ -985,6 +992,13 @@ uint8_t linBurst()
     lin_cmd = LIN_CMD_RECALIBRATE_END;
     state = State::OFF;
     targetHeight = enc_max; // prevents immediately resuming previous height
+
+#if (defined AUTO_SET_MIN_HEIGHT)
+      // Update DANGER_MIN_HEIGHT to currentHeight plus a small safety margin (>= than the allowed drift of 20) where currentHeight is the 
+      // tables position after the recalibration. 
+      DANGER_MIN_HEIGHT = currentHeight + 50;
+      toggleDangerMinHeight();
+#endif
     break;
 
   }
@@ -1351,6 +1365,11 @@ void initAndReadEEPROM(bool force)
     // Store signature value
     eepromPut16(EEPROM_SIG_SLOT, MAGIC_SIG);
   }
+// needs to be set before MINMAX since MINMAX is refering to DANGER_MIN_HEIGHT
+#ifdef AUTO_SET_MIN_HEIGHT
+  // retrieve 
+  DANGER_MIN_HEIGHT = eepromGet16(RECALIBRATE);
+#endif
 #ifdef MINMAX
   // retrieve max/min height
   minHeight = eepromGet16(MIN_HEIGHT_SLOT);
@@ -1365,6 +1384,14 @@ void initAndReadEEPROM(bool force)
 #endif
 }
 
+#ifdef AUTO_SET_MIN_HEIGHT
+// save DANGER_MIN_HEIGHT in EEPROM
+void toggleDangerMinHeight()
+{  
+  beep(DANGER_MAX_HEIGHT, 4);
+  eepromPut16(MIN_HEIGHT_SLOT, DANGER_MAX_HEIGHT);
+}
+#endif
 
 #ifdef MINMAX
 // Swap the minHeight values and save in EEPROM
